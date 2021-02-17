@@ -21,8 +21,8 @@ PROXY={'proxy_url': settings.PROXY_URL, 'urllib3_proxy_kwargs': {'username': set
 
 def where_is_a_planet(planet):
     try:
-        planet = planets[planet]
-        cons = ephem.constellation(planet)[1]
+        ephem_planet = planets[planet]
+        cons = f'Планета {planet.capitalize()} сегодня находится в созвездии {ephem.constellation(ephem_planet)[1]}.'
         return cons
     except (AttributeError, KeyError):
         return(f'Мне ничего не известно о планете {planet.capitalize()}.')
