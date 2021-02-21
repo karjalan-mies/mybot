@@ -15,13 +15,22 @@ planets = {#'earth':ephem.Earth(date),
             'uranus':ephem.Uranus(date),
             }
 
+class Planets:
+            mars = ephem.Mars(date)
+            mercury = ephem.Mercury(date)
+            venus = ephem.Venus(date)
+            jupiter = ephem.Jupiter(date)
+            neptune = ephem.Neptune(date)
+            saturn = ephem.Saturn(date)
+            uranus = ephem.Uranus(date)
+
 logging.basicConfig(filename='bot.log', level=logging.INFO)
 
 PROXY={'proxy_url': settings.PROXY_URL, 'urllib3_proxy_kwargs': {'username': settings.PROXY_USERNAME, 'password': settings.PROXY_PASSWORD}}
 
 def where_is_a_planet(planet):
     try:
-        ephem_planet = planets[planet]
+        ephem_planet = getattr(Planets, planet)
         cons = f'Планета {planet.capitalize()} сегодня находится в созвездии {ephem.constellation(ephem_planet)[1]}.'
         return cons
     except (AttributeError, KeyError):
