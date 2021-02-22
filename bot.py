@@ -26,12 +26,17 @@ def find_a_planet(update, context):
 
 def greet_user(update, context):
 #    print('Вызван /start')
-    update.message.reply_text('Привет, пользователь! Ты вызвал команду \start')
+    update.message.reply_text('Привет, пользователь! Ты вызвал команду \\start')
 
 def talk_to_me(update, context):
     user_text = update.message.text
 
     update.message.reply_text(user_text)
+
+def word_count(update, context):
+    phrase = update.message.text[10:].strip()
+    answer = f'Фраза \'{phrase}\' состоит из {len(phrase.split())} слов.' if len(phrase) > 0 else 'Сообщение не должно быть пустым!'
+    update.message.reply_text(answer)
 
 def main():
     
@@ -40,6 +45,7 @@ def main():
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
     dp.add_handler(CommandHandler("planet", find_a_planet))
+    dp.add_handler(CommandHandler("wordcount", word_count))
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     logging.info('Бот стартовал')
