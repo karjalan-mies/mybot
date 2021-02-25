@@ -2,8 +2,11 @@ import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import settings
 import ephem
-import datetime
-date = datetime.date.today()
+from datetime import datetime
+import locale
+locale.setlocale(locale.LC_TIME, 'ru_RU')
+
+date = datetime.now()
 
 logging.basicConfig(filename='bot.log', level=logging.INFO)
 
@@ -33,10 +36,25 @@ def talk_to_me(update, context):
 
     update.message.reply_text(user_text)
 
+def get_user_message(input_text, len_command):
+    output_text = input_text[len_command:].strip()
+    return output_text
+
 def word_count(update, context):
-    phrase = update.message.text[10:].strip()
+    phrase = get_user_message(update.message.text, 10)
     answer = f'Фраза \'{phrase}\' состоит из {len(phrase.split())} слов.' if len(phrase) > 0 else 'Сообщение не должно быть пустым!'
     update.message.reply_text(answer)
+
+def next_full_moon(update, context):
+    text_message = get_user_message(update.message.text, 15)
+    user_date = datetime.strptime(text_message, '%Y/%m/%d')
+    full_moon_date = str(ephem.next_full_moon(user_date))
+    next_full_moon = ephem.next_full_moon(user_date)
+    date_next_full_moon = datetime.strptime(str(next_full_moon), '%Y/%m/%d %H:%M:%S')
+    if date_next_full_moon > datetime.now():
+        update.message.reply_text(f'Ближайшее полнолуние после {user_date.strftime("%d.%m.%Y")} будет {date_next_full_moon.strftime("%d.%m.%Y")}.')
+    else:
+        update.message.reply_text(f'Ближайшее полнолуние после {user_date.strftime("%d.%m.%Y")} было {date_next_full_moon.strftime("%d.%m.%Y")}.')
 
 def main():
     
@@ -46,6 +64,7 @@ def main():
     dp.add_handler(CommandHandler("start", greet_user))
     dp.add_handler(CommandHandler("planet", find_a_planet))
     dp.add_handler(CommandHandler("wordcount", word_count))
+    dp.add_handler(CommandHandler("next_full_moon", next_full_moon))
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     logging.info('Бот стартовал')
